@@ -6,6 +6,7 @@ import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
+import { PasswordInput } from "@/components/password-input"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/use-toast"
@@ -212,8 +213,8 @@ export default function RegisterPage() {
                 <FormItem>
                   <FormLabel className="text-white">Password</FormLabel>
                   <FormControl>
-                    <Input
-                      type="password"
+                    <PasswordInput
+                      autoComplete="new-password"
                       placeholder="••••••••"
                       {...field}
                       className="bg-[#1A1A2E] border-[#2A2A3E] text-white h-12"
@@ -231,8 +232,8 @@ export default function RegisterPage() {
                 <FormItem>
                   <FormLabel className="text-white">Confirm Password</FormLabel>
                   <FormControl>
-                    <Input
-                      type="password"
+                    <PasswordInput
+                      autoComplete="new-password"
                       placeholder="••••••••"
                       {...field}
                       className="bg-[#1A1A2E] border-[#2A2A3E] text-white h-12"

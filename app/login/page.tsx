@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
+import { PasswordInput } from "@/components/password-input"
 import { useToast } from "@/components/ui/use-toast"
 import { useLoginMutation } from "@/services/auth/client"
 import { getApiErrorMessage } from "@/services/errors"
@@ -125,8 +126,8 @@ export default function LoginPage() {
                 <FormItem>
                   <FormLabel className="text-white">Password</FormLabel>
                   <FormControl>
-                    <Input
-                      type="password"
+                    <PasswordInput
+                      autoComplete="current-password"
                       placeholder="••••••••"
                       {...field}
                       className="bg-[#1A1A2E] border-[#2A2A3E] text-white h-12"
