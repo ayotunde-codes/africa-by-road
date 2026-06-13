@@ -63,7 +63,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col bg-[#0A0A1B] relative overflow-hidden">
       {/* Decorative corner lines */}
-      <div className="absolute top-0 left-0 w-64 h-64">
+      <div className="pointer-events-none absolute top-0 left-0 w-64 h-64">
         <svg width="100%" height="100%" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M0 0C0 110.457 89.5431 200 200 200" stroke="#16A349" strokeWidth="2" />
           <path d="M40 0C40 88.3656 111.634 160 200 160" stroke="#16A349" strokeWidth="2" />
@@ -73,7 +73,7 @@ export default function LoginPage() {
         </svg>
       </div>
 
-      <div className="absolute bottom-0 right-0 w-64 h-64 transform rotate-180">
+      <div className="pointer-events-none absolute bottom-0 right-0 w-64 h-64 transform rotate-180">
         <svg width="100%" height="100%" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M0 0C0 110.457 89.5431 200 200 200" stroke="#16A349" strokeWidth="2" />
           <path d="M40 0C40 88.3656 111.634 160 200 160" stroke="#16A349" strokeWidth="2" />
