@@ -13,6 +13,7 @@ import { PasswordInput } from "@/components/password-input"
 import { useToast } from "@/components/ui/use-toast"
 import { useLoginMutation } from "@/services/auth/client"
 import { getApiErrorMessage } from "@/services/errors"
+import { getSafeRedirectPath } from "@/lib/routes"
 
 const formSchema = z.object({
   email: z.string().email({
@@ -50,7 +51,8 @@ export default function LoginPage() {
         description: "Welcome back to Africa by Road.",
       })
 
-      router.push("/dashboard")
+      const redirectTo = new URLSearchParams(window.location.search).get("redirectTo")
+      router.push(getSafeRedirectPath(redirectTo))
     } catch (error) {
       toast({
         title: "Login failed",
