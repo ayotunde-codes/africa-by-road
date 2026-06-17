@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useState, useEffect } from "react"
+import { isChromelessRoute } from "@/lib/routes"
 
 export function MobileNav() {
   const pathname = usePathname()
@@ -18,11 +19,7 @@ export function MobileNav() {
     return null
   }
 
-  // Public routes where we don't show the mobile nav
-  const publicRoutes = ["/login", "/register", "/verification-sent", "/verify-email"]
-  const isPublicRoute = publicRoutes.includes(pathname) || pathname.startsWith("/registration")
-
-  if (isPublicRoute) {
+  if (isChromelessRoute(pathname)) {
     return null
   }
 

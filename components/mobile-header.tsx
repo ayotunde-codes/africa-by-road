@@ -4,21 +4,18 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useMediaQuery } from "@/hooks/use-media-query"
+import { isChromelessRoute } from "@/lib/routes"
 
 export function MobileHeader() {
   const [isMounted, setIsMounted] = useState(false)
   const isMobile = useMediaQuery("(max-width: 768px)")
   const pathname = usePathname()
 
-  // Public routes that don't need the header
-  const publicRoutes = ["/login", "/register", "/verification-sent", "/verify-email"]
-  const isPublicRoute = publicRoutes.includes(pathname) || pathname.startsWith("/registration")
-
   useEffect(() => {
     setIsMounted(true)
   }, [])
 
-  if (!isMounted || !isMobile || isPublicRoute) {
+  if (!isMounted || !isMobile || isChromelessRoute(pathname)) {
     return null
   }
 
