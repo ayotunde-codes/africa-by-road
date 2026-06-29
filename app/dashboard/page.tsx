@@ -241,7 +241,9 @@ export default function DashboardPage() {
             <p className="text-gray-400 text-sm mb-4">
               Please complete all required documents and information in the Registration Requirements section below.
             </p>
-            <Button className="bg-primary hover:bg-primary/90 text-white w-full">Start Assessment</Button>
+            <Link href="/registration/assessment" className="w-full">
+              <Button className="bg-primary hover:bg-primary/90 text-white w-full">Start Assessment</Button>
+            </Link>
           </CardContent>
         </Card>
 
@@ -428,9 +430,11 @@ export default function DashboardPage() {
                     Please complete all required documents and information in the Registration Requirements section
                     below.
                   </p>
-                  <Button className="mt-3" size="sm">
-                    Start Assessment
-                  </Button>
+                  <Link href="/registration/assessment">
+                    <Button className="mt-3" size="sm">
+                      Start Assessment
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>
