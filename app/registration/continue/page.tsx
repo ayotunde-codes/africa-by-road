@@ -17,24 +17,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { format } from "date-fns"
-import { CalendarIcon, CreditCard, Upload, CheckCircle2, ChevronLeft } from "lucide-react"
+import { CalendarIcon, Upload, CheckCircle2, ChevronLeft } from "lucide-react"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { MobileNav } from "@/components/mobile-nav"
 import { getApiErrorMessage } from "@/services/errors"
 import {
-  useProfileQuery,
   useUpdatePersonalInfoMutation,
   useUpdateSocialProfileMutation,
   useUploadDocumentUrlMutation,
 } from "@/services/profile/client"
-import { useCheckoutMutation } from "@/services/payments/client"
 
 export default function ContinueRegistrationPage() {
   const router = useRouter()
   const { toast } = useToast()
   const [activeTab, setActiveTab] = useState("personal-info")
   const [isLoading, setIsLoading] = useState(false)
-  const [paymentComplete, setPaymentComplete] = useState(false)
   const [uploadedDocuments, setUploadedDocuments] = useState({
     governmentId: false,
     proofOfAddress: false,
@@ -44,8 +41,6 @@ export default function ContinueRegistrationPage() {
   const updatePersonalInfoMutation = useUpdatePersonalInfoMutation()
   const updateSocialProfileMutation = useUpdateSocialProfileMutation()
   const uploadDocumentUrlMutation = useUploadDocumentUrlMutation()
-  const checkoutMutation = useCheckoutMutation()
-  const profileQuery = useProfileQuery()
 
   // Personal Information Form
   const personalInfoForm = useForm<z.infer<typeof personalInfoSchema>>({
@@ -101,40 +96,11 @@ export default function ContinueRegistrationPage() {
         title: "Personal information saved",
         description: "Your personal information has been saved successfully.",
       })
-      setActiveTab("payment")
+      setActiveTab("social-media")
     } catch (error) {
       toast({
         title: "Error",
         description: getApiErrorMessage(error, "There was an error saving your personal information."),
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  // Handle Payment
-  const handlePayment = async () => {
-    setIsLoading(true)
-    try {
-      const email = profileQuery.data?.email
-      const phoneNumber = profileQuery.data?.phoneNumber
-
-      if (!email || !phoneNumber) {
-        throw new Error("Profile email and phone number are required before payment.")
-      }
-
-      await checkoutMutation.mutateAsync({ email, phoneNumber })
-      setPaymentComplete(true)
-      toast({
-        title: "Payment successful",
-        description: "Your registration fee has been paid successfully.",
-      })
-      setActiveTab("social-media")
-    } catch (error) {
-      toast({
-        title: "Payment failed",
-        description: getApiErrorMessage(error, "There was an error processing your payment."),
         variant: "destructive",
       })
     } finally {
@@ -330,8 +296,8 @@ export default function ContinueRegistrationPage() {
                 className={`flex-1 py-3 text-center text-sm ${
                   activeTab === "social-media" ? "bg-[#1E1E3F] text-white" : "text-gray-400"
                 }`}
-                onClick={() => paymentComplete && setActiveTab("social-media")}
-                disabled={!paymentComplete}
+                onClick={() => personalInfoForm.formState.isSubmitSuccessful && setActiveTab("social-media")}
+                disabled={!personalInfoForm.formState.isSubmitSuccessful}
               >
                 Social Media
               </button>
@@ -520,32 +486,16 @@ export default function ContinueRegistrationPage() {
           <div className="px-4 pb-6">
             <div className="bg-[#131326] rounded-lg p-6 mb-6">
               <h3 className="text-xl font-bold mb-2">Registration Fee</h3>
-              <p className="text-gray-400 mb-4">A one-time registration fee is required to complete your membership.</p>
+              <p className="text-gray-400 mb-4">You can continue registration without completing payment here.</p>
               <div className="text-3xl font-bold mb-4">$50.00 USD</div>
-              {paymentComplete ? (
-                <div className="flex items-center text-primary">
-                  <CheckCircle2 className="mr-2 h-5 w-5" />
-                  <span>Payment Complete</span>
-                </div>
-              ) : (
-                <Button
-                  onClick={handlePayment}
-                  disabled={isLoading}
-                  className="w-full h-12 bg-primary hover:bg-primary/90 text-white"
-                >
-                  {isLoading ? "Processing..." : "Make payment"}
-                </Button>
-              )}
             </div>
 
-            {paymentComplete && (
-              <Button
-                onClick={() => setActiveTab("social-media")}
-                className="w-full h-12 bg-primary hover:bg-primary/90 text-white"
-              >
-                Continue
-              </Button>
-            )}
+            <Button
+              onClick={() => setActiveTab("social-media")}
+              className="w-full h-12 bg-primary hover:bg-primary/90 text-white"
+            >
+              Continue
+            </Button>
           </div>
         )}
 
@@ -775,7 +725,7 @@ export default function ContinueRegistrationPage() {
               <TabsTrigger value="payment" disabled={!personalInfoForm.formState.isSubmitSuccessful}>
                 Payment
               </TabsTrigger>
-              <TabsTrigger value="social-media" disabled={!paymentComplete}>
+              <TabsTrigger value="social-media" disabled={!personalInfoForm.formState.isSubmitSuccessful}>
                 Social Media
               </TabsTrigger>
               <TabsTrigger value="documents" disabled={!socialMediaForm.formState.isSubmitSuccessful}>
@@ -952,29 +902,16 @@ export default function ContinueRegistrationPage() {
                 <div className="bg-primary/10 rounded-lg p-6">
                   <h3 className="text-lg font-bold mb-2">Registration Fee</h3>
                   <p className="text-muted-foreground mb-4">
-                    A one-time registration fee is required to complete your membership.
+                    You can continue registration without completing payment here.
                   </p>
                   <div className="flex justify-between items-center">
                     <span className="text-2xl font-bold">$50.00 USD</span>
-                    {paymentComplete ? (
-                      <div className="flex items-center text-primary">
-                        <CheckCircle2 className="mr-2 h-5 w-5" />
-                        <span>Payment Complete</span>
-                      </div>
-                    ) : (
-                      <Button onClick={handlePayment} disabled={isLoading}>
-                        <CreditCard className="mr-2 h-4 w-4" />
-                        {isLoading ? "Processing..." : "Pay Now"}
-                      </Button>
-                    )}
                   </div>
                 </div>
 
-                {paymentComplete && (
-                  <div className="flex justify-end">
-                    <Button onClick={() => setActiveTab("social-media")}>Continue</Button>
-                  </div>
-                )}
+                <div className="flex justify-end">
+                  <Button onClick={() => setActiveTab("social-media")}>Continue</Button>
+                </div>
               </div>
             </TabsContent>
 
