@@ -5,12 +5,14 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
+import { Suspense, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { CheckCircle, MailCheck, XCircle } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
+import { logDiagnostic } from "@/hooks/use-navigation-diagnostics"
 import { useResendVerificationMutation, useVerifyEmailOtpMutation } from "@/services/auth/client"
 import { getApiErrorMessage } from "@/services/errors"
 
@@ -19,12 +21,19 @@ const otpSchema = z.object({
   otp: z.string().min(4, { message: "Enter the verification code." }),
 })
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const { toast } = useToast()
   const verifyMutation = useVerifyEmailOtpMutation()
   const resendMutation = useResendVerificationMutation()
+
+  useEffect(() => {
+    logDiagnostic("[otp] verify email page mounted", {
+      hasEmail: Boolean(searchParams.get("email")),
+      atMs: Math.round(performance.now()),
+    })
+  }, [searchParams])
 
   const form = useForm<z.infer<typeof otpSchema>>({
     resolver: zodResolver(otpSchema),
@@ -140,5 +149,13 @@ export default function VerifyEmailPage() {
         </CardFooter>
       </Card>
     </div>
+  )
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#0A0A1B]" />}>
+      <VerifyEmailContent />
+    </Suspense>
   )
 }

@@ -10,12 +10,14 @@ import { useMediaQuery } from "@/hooks/use-media-query"
 import { usePathname } from "next/navigation"
 import { AuthRouteGuard } from "@/components/auth-route-guard"
 import { isChromelessRoute } from "@/lib/routes"
+import { useNavigationDiagnostics } from "@/hooks/use-navigation-diagnostics"
 
 export function AppLayoutWrapper({ children }: { children: React.ReactNode }) {
   const [isMounted, setIsMounted] = useState(false)
   const isDesktop = useMediaQuery("(min-width: 768px)")
   const pathname = usePathname()
   const isMobile = !isDesktop
+  useNavigationDiagnostics("AppLayoutWrapper", pathname)
 
   const isChromeless = isChromelessRoute(pathname)
 

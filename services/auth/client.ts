@@ -1,9 +1,10 @@
 "use client"
 
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { queryKeys } from "@/services/query-keys"
 import {
   forgotPassword,
+  getSession,
   login,
   logout,
   register,
@@ -15,19 +16,27 @@ import {
 } from "./api"
 
 export function useRegisterMutation() {
-  return useMutation({ mutationFn: register })
+  const queryClient = useQueryClient()
+  return useMutation({ mutationFn: register, onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.auth.session }) })
 }
 
 export function useLoginMutation() {
-  return useMutation({ mutationFn: login })
+  const queryClient = useQueryClient()
+  return useMutation({ mutationFn: login, onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.auth.session }) })
 }
 
 export function useLogoutMutation() {
-  return useMutation({ mutationFn: logout })
+  const queryClient = useQueryClient()
+  return useMutation({ mutationFn: logout, onSuccess: () => queryClient.removeQueries({ queryKey: queryKeys.auth.session }) })
+}
+
+export function useSessionQuery(enabled = true) {
+  return useQuery({ queryKey: queryKeys.auth.session, queryFn: getSession, enabled, retry: false, staleTime: 30_000 })
 }
 
 export function useVerifyEmailOtpMutation() {
-  return useMutation({ mutationFn: verifyEmailOtp })
+  const queryClient = useQueryClient()
+  return useMutation({ mutationFn: verifyEmailOtp, onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.auth.session }) })
 }
 
 export function useResendVerificationMutation() {
@@ -35,7 +44,8 @@ export function useResendVerificationMutation() {
 }
 
 export function useVerifyGoogleMutation() {
-  return useMutation({ mutationFn: verifyGoogle })
+  const queryClient = useQueryClient()
+  return useMutation({ mutationFn: verifyGoogle, onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.auth.session }) })
 }
 
 export function useForgotPasswordMutation() {

@@ -35,9 +35,7 @@ export interface VerifyOtpPayload {
   otp: string
 }
 
-export interface VerifyOtpResponse extends ApiMessageResponse {
-  user: Pick<AuthUser, "id" | "email" | "isEmailVerified">
-}
+export type VerifyOtpResponse = AuthResponse
 
 export interface EmailPayload {
   email: string

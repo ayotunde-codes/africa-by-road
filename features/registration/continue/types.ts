@@ -23,6 +23,6 @@ export interface ContinueRegistrationController {
   onPersonalInfoSubmit: (values: PersonalInfoValues) => Promise<void>
   onSocialMediaSubmit: (values: SocialMediaValues) => Promise<void>
   onDocumentUploadSubmit: () => Promise<void>
-  handleDocumentUpload: (documentType: DocumentKey) => void
+  handleDocumentUpload: (documentType: DocumentKey, file: File) => void
   goToDashboard: () => void
 }

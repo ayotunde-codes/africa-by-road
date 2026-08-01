@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useState, useEffect } from "react"
 import { isChromelessRoute } from "@/lib/routes"
+import { logNavigationStart } from "@/hooks/use-navigation-diagnostics"
 
 export function MobileNav() {
   const pathname = usePathname()
@@ -176,7 +177,10 @@ export function MobileNav() {
           <button
             key={item.name}
             className={`flex flex-col items-center p-2 ${isActive ? "text-primary" : "text-gray-400"}`}
-            onClick={() => router.push(item.href)}
+            onClick={() => {
+              logNavigationStart("MobileNav", item.href)
+              router.push(item.href)
+            }}
           >
             {item.icon(isActive)}
             <span className="text-xs mt-1">{item.name}</span>

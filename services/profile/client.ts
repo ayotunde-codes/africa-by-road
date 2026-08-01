@@ -7,7 +7,7 @@ import {
   getRegistrationStatus,
   updatePersonalInfo,
   updateSocialProfile,
-  uploadDocumentUrl,
+  uploadDocument,
 } from "./api"
 
 export function useProfileQuery() {
@@ -41,11 +41,11 @@ export function useUpdateSocialProfileMutation() {
   })
 }
 
-export function useUploadDocumentUrlMutation() {
+export function useUploadDocumentMutation() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: uploadDocumentUrl,
+    mutationFn: uploadDocument,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.profile.detail })
       queryClient.invalidateQueries({ queryKey: queryKeys.profile.status })

@@ -1,44 +1,47 @@
-# Memory — Registration Continue Refactor
+# Memory — Registration/Auth Bug Fixes
 
-Last updated: 2026-07-07 09:09 WAT
+Last updated: 2026-08-01 WAT
 
 ## What was built
 
-Refactored `app/registration/continue/page.tsx` from 1121 lines into a 17-line route orchestrator. Added `features/registration/continue/` with focused files for the controller hook, constants, types, mobile and desktop views, and step components:
+Fixed the reported registration/auth bugs:
 
-- `use-continue-registration.ts`
-- `desktop-registration-view.tsx`
-- `mobile-registration-view.tsx`
-- `mobile-registration-header.tsx`
-- `personal-info-form.tsx`
-- `social-media-form.tsx`
-- `documents-form.tsx`
-- `payment-step.tsx`
-- `constants.ts`
-- `types.ts`
+- Added a reusable searchable country combobox in `features/registration/components/country-combobox.tsx`.
+- Added a fuller Africa-focused country list in `features/registration/countries.ts`.
+- Replaced the personal-info country select with the searchable combobox in `features/registration/continue/personal-info-form.tsx`.
+- Replaced the register page nationality text input with the same searchable combobox in `app/register/page.tsx`.
+- Added `/forgot-password` and `/reset-password` pages wired to existing auth service hooks under `features/auth/password-reset/`.
+- Added public/chromeless route entries for forgot/reset password in `lib/routes.ts`.
+- Added dev-only route/render diagnostics in `hooks/use-navigation-diagnostics.ts`, `components/app-layout-wrapper.tsx`, `components/auth-route-guard.tsx`, `components/mobile-nav.tsx`, `components/sidebar.tsx`, `app/register/page.tsx`, and `app/verify-email/page.tsx`.
+- Wrapped search-param auth pages in Suspense where needed for Next production build.
 
 ## Decisions made
 
-Kept the route page as a thin mobile/desktop switch and moved all registration state/submission handlers into `useContinueRegistration`. Preserved existing API calls, tab gating, routes, toast messages, form schemas, and visual structure while replacing the mobile header inline SVGs with equivalent Lucide icons.
+Country/nationality selection now uses one shared combobox and country source to keep registration behavior consistent. Diagnostics are guarded to development builds only and avoid logging submitted email addresses. Forgot/reset password uses the backend contract already present in `services/auth/api.ts` rather than introducing new endpoints.
 
 ## Problems solved
 
-The largest file violating the repo's rough 160-line guidance is now split. Every new `features/registration/continue/` file is at or below 159 lines.
+The login "Forgot password" link no longer 404s. The reset-password page satisfies Next's `useSearchParams` Suspense requirement. OTP delay diagnosis now has logs for registration API duration, verification route prefetching, navigation requests, route settlement, and verification page mount.
 
 ## Current state
 
 Verification passed:
 
 - `pnpm lint`
-- `pnpm build`
 - `pnpm exec tsc --noEmit`
+- `pnpm build`
+- Dev server is running in this session at `http://127.0.0.1:3000` with PID `10625`; `/forgot-password` and `/reset-password?token=test` returned HTTP 200.
 
-There are still other files over 160 lines, including `app/giveaways/page.tsx`, `app/dashboard/page.tsx`, `app/community/page.tsx`, `app/vote/page.tsx`, `app/profile/page.tsx`, `components/chat-input.tsx`, `app/register/page.tsx`, `components/chat-message.tsx`, `components/mobile-nav.tsx`, `app/login/page.tsx`, and `components/sidebar.tsx`.
+The July registration/auth work is now included on `nest-security-fixes`. The frontend uses backend httpOnly-cookie sessions, maps `country` to the backend `nationality` field, and uploads real multipart document files instead of placeholder URLs. Security headers are enabled and production dependency overrides pin patched Sharp/PostCSS releases.
+
+The matching backend branch is `/Users/ayotundeobasa/Documents/GitHub/africa-by-road` on `nest-security-fixes`. Its Nest API uses the `/api` prefix and is prepared for Render + persistent MongoDB Atlas + private Cloudinary documents.
+
+Latest verification passed: `pnpm lint`, `pnpm exec tsc --noEmit`, `pnpm build`, `pnpm audit --prod`, and `pnpm test:api`.
 
 ## Next session starts with
 
-If continuing the cleanup, pick the next oversized route page and split it into feature-level components using the same pattern: thin route file, state/data hook where useful, constants/types beside the feature components, then verify with lint, build, and TypeScript.
+Push both `nest-security-fixes` branches, deploy the backend from `render.yaml`, set `NEXT_PUBLIC_API_BASE_URL` to the Render URL, then smoke-test registration, verification, login, document upload, and payments end to end.
 
 ## Open questions
 
-Should the 160-line target be enforced across all app/components files now, or should cleanup happen opportunistically as each feature is touched?
+Should the country list remain Africa-focused for Africa by Road, or should it become a full world country list?

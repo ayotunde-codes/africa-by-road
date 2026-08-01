@@ -34,7 +34,7 @@ export interface SocialProfilePayload {
 
 export interface DocumentUploadPayload {
   documentType: string
-  url: string
+  file: File
 }
 
 export interface ProfileResponse {

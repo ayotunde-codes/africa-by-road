@@ -14,7 +14,7 @@ import { getApiErrorMessage } from "@/services/errors"
 import {
   useUpdatePersonalInfoMutation,
   useUpdateSocialProfileMutation,
-  useUploadDocumentUrlMutation,
+  useUploadDocumentMutation,
 } from "@/services/profile/client"
 import type {
   DocumentKey,
@@ -36,7 +36,7 @@ export function useContinueRegistration() {
   })
   const updatePersonalInfoMutation = useUpdatePersonalInfoMutation()
   const updateSocialProfileMutation = useUpdateSocialProfileMutation()
-  const uploadDocumentUrlMutation = useUploadDocumentUrlMutation()
+  const uploadDocumentMutation = useUploadDocumentMutation()
 
   const personalInfoForm = useForm<PersonalInfoValues>({
     resolver: zodResolver(personalInfoSchema),
@@ -69,7 +69,7 @@ export function useContinueRegistration() {
         middleName: values.middleName,
         lastName: values.lastName,
         dateOfBirth: values.dateOfBirth.toISOString(),
-        country: values.country,
+        nationality: values.country,
         state: values.state,
         city: values.city,
         residentialAddress: values.address,
@@ -104,10 +104,10 @@ export function useContinueRegistration() {
     }
   }
 
-  const handleDocumentUpload = (documentType: DocumentKey) => {
+  const handleDocumentUpload = (documentType: DocumentKey, file: File) => {
     setIsLoading(true)
-    uploadDocumentUrlMutation
-      .mutateAsync({ documentType, url: "/placeholder.svg" })
+    uploadDocumentMutation
+      .mutateAsync({ documentType, file })
       .then(() => {
         setUploadedDocuments((prev) => ({ ...prev, [documentType]: true }))
         documentUploadForm.setValue(documentType, true)

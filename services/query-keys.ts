@@ -3,6 +3,7 @@ export const queryKeys = {
     dashboard: ["app", "dashboard"] as const,
   },
   auth: {
+    session: ["auth", "session"] as const,
     resetToken: (token: string) => ["auth", "reset-password", token] as const,
   },
   community: {

@@ -8,9 +8,8 @@ import { Calendar } from "@/components/ui/calendar"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
-import { COUNTRY_OPTIONS } from "./constants"
+import { CountryCombobox } from "@/features/registration/components/country-combobox"
 import type { PersonalInfoValues } from "./types"
 
 interface PersonalInfoFormProps {
@@ -109,20 +108,15 @@ export function PersonalInfoForm({ form, isLoading, onSubmit, variant = "desktop
             render={({ field }) => (
               <FormItem>
                 <FormLabel className={labelClass}>Country</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger className={inputClass}>
-                      <SelectValue placeholder={isMobile ? "Select country" : "Select a country"} />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className={isMobile ? "bg-[#1E1E3F] text-white border-0" : ""}>
-                    {COUNTRY_OPTIONS.map((country) => (
-                      <SelectItem key={country.value} value={country.value}>
-                        {country.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <FormControl>
+                  <CountryCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder={isMobile ? "Select country" : "Select a country"}
+                    className={inputClass}
+                    contentClassName={isMobile ? "bg-[#1E1E3F] text-white border-0" : ""}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

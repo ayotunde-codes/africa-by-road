@@ -30,11 +30,11 @@ export async function updateSocialProfile(payload: SocialProfilePayload) {
   return data
 }
 
-export async function uploadDocumentUrl(payload: DocumentUploadPayload) {
-  const { data } = await apiClient.put<ProfileResponse>(`${PROFILE_BASE}/documents`, {
-    type: payload.documentType,
-    url: payload.url,
-  })
+export async function uploadDocument(payload: DocumentUploadPayload) {
+  const form = new FormData()
+  form.append("type", payload.documentType)
+  form.append("file", payload.file)
+  const { data } = await apiClient.put<ProfileResponse>(`${PROFILE_BASE}/documents`, form)
   return data
 }
 

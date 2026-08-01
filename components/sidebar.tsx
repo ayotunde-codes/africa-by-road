@@ -7,8 +7,11 @@ import { usePathname, useRouter } from "next/navigation"
 import { LayoutDashboard, Vote, Users, Gift, Menu, LogOut } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useToast } from "@/components/ui/use-toast"
+import { logNavigationStart } from "@/hooks/use-navigation-diagnostics"
+import { useLogoutMutation } from "@/services/auth/client"
+import { getApiErrorMessage } from "@/services/errors"
 
 interface NavItemProps {
   href: string
@@ -19,7 +22,7 @@ interface NavItemProps {
 
 const NavItem = ({ href, icon, label, isActive }: NavItemProps) => {
   return (
-    <Link href={href} className="w-full">
+    <Link href={href} className="w-full" onClick={() => logNavigationStart("Sidebar", href)}>
       <Button
         variant="ghost"
         className={cn(
@@ -39,36 +42,16 @@ export default function Sidebar() {
   const router = useRouter()
   const { toast } = useToast()
   const [collapsed, setCollapsed] = useState(false)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const logoutMutation = useLogoutMutation()
 
-  // Check if user is authenticated on component mount
-  useEffect(() => {
-    const authToken = localStorage.getItem("authToken")
-    setIsAuthenticated(!!authToken)
-
-    // If not authenticated, redirect to login
-    if (!authToken) {
+  const handleLogout = async () => {
+    try {
+      await logoutMutation.mutateAsync()
+      toast({ title: "Logged out", description: "You have been successfully logged out." })
       router.replace("/login")
+    } catch (error) {
+      toast({ title: "Logout failed", description: getApiErrorMessage(error, "Please try again."), variant: "destructive" })
     }
-  }, [router])
-
-  // If not authenticated, don't render the sidebar
-  if (!isAuthenticated) {
-    return null
-  }
-
-  const handleLogout = () => {
-    // Remove auth token
-    localStorage.removeItem("authToken")
-
-    // Show toast
-    toast({
-      title: "Logged out",
-      description: "You have been successfully logged out.",
-    })
-
-    // Redirect to login
-    router.replace("/login")
   }
 
   const routes = [

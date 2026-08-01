@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -10,6 +11,8 @@ import { PasswordInput } from "@/components/password-input"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/use-toast"
+import { CountryCombobox } from "@/features/registration/components/country-combobox"
+import { logDiagnostic, logNavigationStart } from "@/hooks/use-navigation-diagnostics"
 import { useRegisterMutation } from "@/services/auth/client"
 import { getApiErrorMessage } from "@/services/errors"
 
@@ -45,6 +48,11 @@ export default function RegisterPage() {
   const { toast } = useToast()
   const registerMutation = useRegisterMutation()
 
+  useEffect(() => {
+    router.prefetch("/verify-email")
+    logDiagnostic("[otp] prefetched /verify-email route")
+  }, [router])
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -59,6 +67,8 @@ export default function RegisterPage() {
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    const startedAt = performance.now()
+    logDiagnostic("[otp] registration submit started")
     try {
       await registerMutation.mutateAsync({
         email: values.email,
@@ -68,13 +78,18 @@ export default function RegisterPage() {
         phoneNumber: values.phoneNumber,
         nationality: values.nationality,
       })
+      logDiagnostic("[otp] registration API completed", {
+        durationMs: Math.round(performance.now() - startedAt),
+      })
 
       toast({
         title: "Registration initiated!",
         description: "Enter the verification code sent to your email.",
       })
 
-      router.push(`/verify-email?email=${encodeURIComponent(values.email)}`)
+      const verifyPath = `/verify-email?email=${encodeURIComponent(values.email)}`
+      logNavigationStart("RegisterPage", "/verify-email")
+      router.push(verifyPath)
     } catch (error) {
       toast({
         title: "Registration failed",
@@ -196,10 +211,12 @@ export default function RegisterPage() {
                 <FormItem>
                   <FormLabel className="text-white">Nationality</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Nigeria"
-                      {...field}
+                    <CountryCombobox
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select nationality"
                       className="bg-[#1A1A2E] border-[#2A2A3E] text-white h-12"
+                      contentClassName="bg-[#1A1A2E] border-[#2A2A3E] text-white"
                     />
                   </FormControl>
                   <FormMessage />

@@ -1,6 +1,7 @@
-import { apiClient, clearAuthToken, setAuthToken } from "@/services/http"
+import { apiClient } from "@/services/http"
 import type {
   ApiMessageResponse,
+  AuthUser,
   AuthResponse,
   EmailPayload,
   GoogleVerifyPayload,
@@ -16,19 +17,16 @@ const AUTH_BASE = "/api/auth"
 
 export async function register(payload: RegisterPayload) {
   const { data } = await apiClient.post<AuthResponse>(`${AUTH_BASE}/register`, payload)
-  setAuthToken(data.token)
   return data
 }
 
 export async function login(payload: LoginPayload) {
   const { data } = await apiClient.post<AuthResponse>(`${AUTH_BASE}/login`, payload)
-  setAuthToken(data.token)
   return data
 }
 
 export async function logout() {
   const { data } = await apiClient.post<ApiMessageResponse>(`${AUTH_BASE}/logout`)
-  clearAuthToken()
   return data
 }
 
@@ -44,7 +42,11 @@ export async function resendVerification(payload: EmailPayload) {
 
 export async function verifyGoogle(payload: GoogleVerifyPayload) {
   const { data } = await apiClient.post<GoogleVerifyResponse>(`${AUTH_BASE}/google/verify`, payload)
-  setAuthToken(data.data.token)
+  return data
+}
+
+export async function getSession() {
+  const { data } = await apiClient.get<{ user: AuthUser }>(`${AUTH_BASE}/session`)
   return data
 }
 

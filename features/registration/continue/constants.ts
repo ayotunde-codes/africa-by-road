@@ -1,15 +1,5 @@
 import type { DocumentKey } from "./types"
 
-export const COUNTRY_OPTIONS = [
-  { value: "nigeria", label: "Nigeria" },
-  { value: "kenya", label: "Kenya" },
-  { value: "south_africa", label: "South Africa" },
-  { value: "ghana", label: "Ghana" },
-  { value: "egypt", label: "Egypt" },
-  { value: "morocco", label: "Morocco" },
-  { value: "tanzania", label: "Tanzania" },
-]
-
 export const SOCIAL_FIELDS = [
   { name: "instagram", label: "Instagram", placeholder: "https://instagram.com/username" },
   { name: "facebook", label: "Facebook", placeholder: "https://facebook.com/username" },

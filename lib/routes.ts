@@ -1,5 +1,5 @@
-const PUBLIC_ROUTES = ["/", "/login", "/register", "/verification-sent", "/verify-email"]
-const CHROMELESS_ROUTES = ["/login", "/register", "/verification-sent", "/verify-email"]
+const PUBLIC_ROUTES = ["/", "/login", "/register", "/verification-sent", "/verify-email", "/forgot-password", "/reset-password"]
+const CHROMELESS_ROUTES = ["/login", "/register", "/verification-sent", "/verify-email", "/forgot-password", "/reset-password"]
 
 function matchesRoute(pathname: string, route: string) {
   return pathname === route || pathname.startsWith(`${route}/`)

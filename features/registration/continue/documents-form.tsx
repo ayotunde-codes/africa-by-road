@@ -1,6 +1,7 @@
 "use client"
 
 import { CheckCircle2, Upload } from "lucide-react"
+import { useRef } from "react"
 import type { UseFormReturn } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
@@ -12,7 +13,7 @@ interface DocumentsFormProps {
   isLoading: boolean
   uploadedDocuments: UploadedDocuments
   variant?: "mobile" | "desktop"
-  onUpload: (documentType: DocumentKey) => void
+  onUpload: (documentType: DocumentKey, file: File) => void
   onSubmit: () => Promise<void>
 }
 
@@ -82,7 +83,7 @@ function MobileDocumentCard({
   document: (typeof DOCUMENT_REQUIREMENTS)[number]
   uploaded: boolean
   isLoading: boolean
-  onUpload: (documentType: DocumentKey) => void
+  onUpload: (documentType: DocumentKey, file: File) => void
 }) {
   return (
     <div>
@@ -92,15 +93,13 @@ function MobileDocumentCard({
         <Upload className="h-6 w-6 text-gray-400 mb-2" />
         <p className="text-sm text-center mb-1">Choose a file or drag & drop it here</p>
         <p className="text-xs text-gray-400 mb-3">JPEG, PNG, PDF, up to 5MB</p>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => onUpload(document.key)}
-          disabled={isLoading || uploaded}
+        <DocumentUploadButton
+          document={document}
+          uploaded={uploaded}
+          isLoading={isLoading}
+          onUpload={onUpload}
           className="bg-transparent border-white text-white hover:bg-white/10"
-        >
-          {uploaded ? "Uploaded" : "Browse File"}
-        </Button>
+        />
       </div>
     </div>
   )
@@ -115,7 +114,7 @@ function DesktopDocumentCard({
   document: (typeof DOCUMENT_REQUIREMENTS)[number]
   uploaded: boolean
   isLoading: boolean
-  onUpload: (documentType: DocumentKey) => void
+  onUpload: (documentType: DocumentKey, file: File) => void
 }) {
   return (
     <div className="border rounded-lg p-6">
@@ -130,12 +129,51 @@ function DesktopDocumentCard({
             <span>Uploaded</span>
           </div>
         ) : (
-          <Button type="button" variant="outline" onClick={() => onUpload(document.key)} disabled={isLoading}>
-            <Upload className="mr-2 h-4 w-4" />
-            {isLoading ? "Uploading..." : "Upload"}
-          </Button>
+          <DocumentUploadButton document={document} uploaded={uploaded} isLoading={isLoading} onUpload={onUpload} />
         )}
       </div>
     </div>
+  )
+}
+
+function DocumentUploadButton({
+  document,
+  uploaded,
+  isLoading,
+  onUpload,
+  className,
+}: {
+  document: (typeof DOCUMENT_REQUIREMENTS)[number]
+  uploaded: boolean
+  isLoading: boolean
+  onUpload: (documentType: DocumentKey, file: File) => void
+  className?: string
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  return (
+    <>
+      <input
+        ref={inputRef}
+        type="file"
+        className="hidden"
+        accept="image/jpeg,image/png,application/pdf"
+        onChange={(event) => {
+          const file = event.target.files?.[0]
+          if (file) onUpload(document.key, file)
+          event.currentTarget.value = ""
+        }}
+      />
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => inputRef.current?.click()}
+        disabled={isLoading || uploaded}
+        className={className}
+      >
+        {!uploaded && <Upload className="mr-2 h-4 w-4" />}
+        {uploaded ? "Uploaded" : isLoading ? "Uploading..." : "Upload"}
+      </Button>
+    </>
   )
 }
